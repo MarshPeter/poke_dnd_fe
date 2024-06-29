@@ -12,6 +12,7 @@ import {
 import { Form, useNavigate } from "react-router-dom";
 import ItemList from "./components/Trainer/ItemList";
 import { z } from "zod";
+import CharacterStatTable from "./components/Trainer/CharacterStatTable";
 
 const trainerItems = [
     {
@@ -46,10 +47,6 @@ interface TrainerStats {
     hunting: number;
 }
 
-interface TrainerStatsAccessor {
-    key<K extends keyof TrainerStats>(k: K): TrainerStats[K];
-}
-
 export default function Trainer() {
     const navigate = useNavigate();
     const [currentHealth, setCurrentHealth] = useState(10);
@@ -64,13 +61,6 @@ export default function Trainer() {
         healing: 0,
         hunting: 0,
     });
-    const [heartStat, setHeartStat] = useState(0);
-    const [bodyStat, setBodyStat] = useState(0);
-    const [brainStat, setBrainStat] = useState(0);
-    const [creativityStat, setCreativityStat] = useState(0);
-    const [supportStat, setSupportStat] = useState(0);
-    const [healingStat, setHealingStat] = useState(0);
-    const [huntingStat, setHuntingStat] = useState(0);
     const [items, setItems] = useState(trainerItems);
     const [isNewItem, setIsNewItem] = useState(false);
     const [newItem, setNewItem] = useState("");
@@ -93,13 +83,6 @@ export default function Trainer() {
             currentStats.hunting;
         return totalStats < 1 + currentBadges;
     }
-    // heart: 0,
-    // brain: 0,
-    // body: 0,
-    // creativity: 0,
-    // support: 0,
-    // healing: 0,
-    // hunting: 0,
 
     function modifyTrainerStat(
         statName: "creativity" | "support" | "healing" | "hunting",
@@ -193,86 +176,10 @@ export default function Trainer() {
                 </Button>
                 <div className="flex flex-col items-center">
                     <h3>Character Stats</h3>
-                    <Table>
-                        <TableCaption>2 + Badge Count</TableCaption>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Stat</TableHead>
-                                <TableHead>Value</TableHead>
-                                <TableHead>Action</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {/* THE CODE BELOW WORKS, I JUST WANT TO SEE IF I CAN
-                            DRY IT */}
-                            <TableRow>
-                                <TableCell className="font-bold">
-                                    Heart
-                                </TableCell>
-                                <TableCell>{currentStats.heart}</TableCell>
-                                <TableCell className="flex flex-col gap-2">
-                                    <Button
-                                        onMouseDown={() =>
-                                            modifyCharacterStat("heart", 1)
-                                        }
-                                    >
-                                        inc
-                                    </Button>
-                                    <Button
-                                        onMouseDown={() =>
-                                            modifyCharacterStat("heart", -1)
-                                        }
-                                    >
-                                        dec
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell className="font-bold">
-                                    Brain
-                                </TableCell>
-                                <TableCell>{currentStats.brain}</TableCell>
-                                <TableCell className="flex flex-col gap-2">
-                                    <Button
-                                        onMouseDown={() =>
-                                            modifyCharacterStat("brain", 1)
-                                        }
-                                    >
-                                        inc
-                                    </Button>
-                                    <Button
-                                        onMouseDown={() =>
-                                            modifyCharacterStat("brain", -1)
-                                        }
-                                    >
-                                        dec
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell className="font-bold">
-                                    Body
-                                </TableCell>
-                                <TableCell>{currentStats.body}</TableCell>
-                                <TableCell className="flex flex-col gap-2">
-                                    <Button
-                                        onMouseDown={() =>
-                                            modifyCharacterStat("body", 1)
-                                        }
-                                    >
-                                        inc
-                                    </Button>
-                                    <Button
-                                        onMouseDown={() =>
-                                            modifyCharacterStat("body", -1)
-                                        }
-                                    >
-                                        dec
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                    <CharacterStatTable
+                        currentStats={currentStats}
+                        modifyCharacterStat={modifyCharacterStat}
+                    ></CharacterStatTable>
                 </div>
                 <div className="flex flex-col items-center">
                     <h3>Trainer Stats</h3>
