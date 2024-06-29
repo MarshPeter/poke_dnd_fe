@@ -9,8 +9,9 @@ import {
     TableHeader,
     TableRow,
 } from "./components/ui/table";
-import { useNavigate } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import ItemList from "./components/Trainer/ItemList";
+import { z } from "zod";
 
 const trainerItems = [
     {
@@ -33,6 +34,8 @@ const trainerItems = [
     },
 ];
 
+const itemSchema = z.object({});
+
 export default function Trainer() {
     const navigate = useNavigate();
     const [currentHealth, setCurrentHealth] = useState(10);
@@ -45,6 +48,9 @@ export default function Trainer() {
     const [supportStat, setSupportStat] = useState(0);
     const [healingStat, setHealingStat] = useState(0);
     const [huntingStat, setHuntingStat] = useState(0);
+    const [items, setItems] = useState(trainerItems);
+    const [isNewItem, setIsNewItem] = useState(false);
+    const [newItem, setNewItem] = useState("");
 
     function navigateToPokemonParty() {
         navigate("/trainer/1/pokemon");
@@ -310,6 +316,9 @@ export default function Trainer() {
                 </div>
                 <div>
                     <ItemList trainerItems={trainerItems}></ItemList>
+                </div>
+                <div>
+                    <Form></Form>
                 </div>
             </div>
         </main>
