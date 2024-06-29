@@ -36,11 +36,34 @@ const trainerItems = [
 
 const itemSchema = z.object({});
 
+interface TrainerStats {
+    heart: number;
+    brain: number;
+    body: number;
+    creativity: number;
+    support: number;
+    healing: number;
+    hunting: number;
+}
+
+interface TrainerStatsAccessor {
+    key<K extends keyof TrainerStats>(k: K): TrainerStats[K];
+}
+
 export default function Trainer() {
     const navigate = useNavigate();
     const [currentHealth, setCurrentHealth] = useState(10);
     const [maxHealth, setMaxHealth] = useState(10);
     const [currentBadges, setCurrentBadges] = useState(0);
+    const [currentStats, setCurrentStats] = useState<TrainerStats>({
+        heart: 0,
+        brain: 0,
+        body: 0,
+        creativity: 0,
+        support: 0,
+        healing: 0,
+        hunting: 0,
+    });
     const [heartStat, setHeartStat] = useState(0);
     const [bodyStat, setBodyStat] = useState(0);
     const [brainStat, setBrainStat] = useState(0);
@@ -57,14 +80,70 @@ export default function Trainer() {
     }
 
     function characterStatsUnderLimit(): boolean {
-        return heartStat + bodyStat + brainStat < 2 + currentBadges;
+        const totalStats =
+            currentStats.heart + currentStats.body + currentStats.brain;
+        return totalStats < 2 + currentBadges;
     }
 
     function trainerStatsUnderLimit(): boolean {
-        return (
-            creativityStat + supportStat + healingStat + huntingStat <
-            1 + currentBadges
-        );
+        const totalStats =
+            currentStats.creativity +
+            currentStats.support +
+            currentStats.healing +
+            currentStats.hunting;
+        return totalStats < 1 + currentBadges;
+    }
+    // heart: 0,
+    // brain: 0,
+    // body: 0,
+    // creativity: 0,
+    // support: 0,
+    // healing: 0,
+    // hunting: 0,
+
+    function modifyTrainerStat(
+        statName: "creativity" | "support" | "healing" | "hunting",
+        adjustValue: number = 1
+    ) {
+        // incrementing test
+        if (adjustValue > 0 && !trainerStatsUnderLimit()) {
+            return;
+        }
+
+        modifySpecificTrainerStatByValue(statName, adjustValue);
+    }
+
+    function modifyCharacterStat(
+        statName: "heart" | "brain" | "body",
+        adjustValue: number = 1
+    ) {
+        // incrementing test
+        if (adjustValue > 0 && !characterStatsUnderLimit()) {
+            return;
+        }
+
+        modifySpecificTrainerStatByValue(statName, adjustValue);
+    }
+
+    function modifySpecificTrainerStatByValue(
+        statName:
+            | "heart"
+            | "brain"
+            | "body"
+            | "creativity"
+            | "support"
+            | "healing"
+            | "hunting",
+        adjustValue: number = 1
+    ) {
+        console.log("Incrementing value: " + statName);
+        const newStats: TrainerStats = {
+            ...currentStats,
+        };
+
+        newStats[statName] = newStats[statName] + adjustValue;
+
+        setCurrentStats({ ...newStats });
     }
 
     function incrementHealth() {
@@ -83,76 +162,6 @@ export default function Trainer() {
         if (currentBadges > 0) {
             setCurrentBadges(currentBadges - 1);
         }
-    }
-
-    function incrementBodyStat() {
-        if (characterStatsUnderLimit()) {
-            setBodyStat(bodyStat + 1);
-        }
-    }
-
-    function decrementBodyStat() {
-        setBodyStat(bodyStat - 1);
-    }
-
-    function incrementBrainStat() {
-        if (characterStatsUnderLimit()) {
-            setBrainStat(brainStat + 1);
-        }
-    }
-
-    function decrementBrainStat() {
-        setBrainStat(brainStat - 1);
-    }
-
-    function incrementHeartStat() {
-        if (characterStatsUnderLimit()) {
-            setHeartStat(heartStat + 1);
-        }
-    }
-
-    function decrementHeartStat() {
-        setHeartStat(heartStat - 1);
-    }
-
-    function incrementCreativityStat() {
-        if (trainerStatsUnderLimit()) {
-            setCreativityStat(creativityStat + 1);
-        }
-    }
-
-    function decrementCreativityStat() {
-        setCreativityStat(creativityStat - 1);
-    }
-
-    function incrementSupportStat() {
-        if (trainerStatsUnderLimit()) {
-            setSupportStat(supportStat + 1);
-        }
-    }
-
-    function decrementSupportStat() {
-        setSupportStat(supportStat - 1);
-    }
-
-    function incrementHealingStat() {
-        if (trainerStatsUnderLimit()) {
-            setHealingStat(healingStat + 1);
-        }
-    }
-
-    function decrementHealingStat() {
-        setHealingStat(healingStat - 1);
-    }
-
-    function incrementHuntingStat() {
-        if (trainerStatsUnderLimit()) {
-            setHuntingStat(huntingStat + 1);
-        }
-    }
-
-    function decrementHuntingStat() {
-        setHuntingStat(huntingStat - 1);
     }
 
     return (
@@ -194,16 +203,26 @@ export default function Trainer() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
+                            {/* THE CODE BELOW WORKS, I JUST WANT TO SEE IF I CAN
+                            DRY IT */}
                             <TableRow>
                                 <TableCell className="font-bold">
                                     Heart
                                 </TableCell>
-                                <TableCell>{heartStat}</TableCell>
+                                <TableCell>{currentStats.heart}</TableCell>
                                 <TableCell className="flex flex-col gap-2">
-                                    <Button onMouseDown={incrementHeartStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyCharacterStat("heart", 1)
+                                        }
+                                    >
                                         inc
                                     </Button>
-                                    <Button onMouseDown={decrementHeartStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyCharacterStat("heart", -1)
+                                        }
+                                    >
                                         dec
                                     </Button>
                                 </TableCell>
@@ -212,12 +231,20 @@ export default function Trainer() {
                                 <TableCell className="font-bold">
                                     Brain
                                 </TableCell>
-                                <TableCell>{brainStat}</TableCell>
+                                <TableCell>{currentStats.brain}</TableCell>
                                 <TableCell className="flex flex-col gap-2">
-                                    <Button onMouseDown={incrementBrainStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyCharacterStat("brain", 1)
+                                        }
+                                    >
                                         inc
                                     </Button>
-                                    <Button onMouseDown={decrementBrainStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyCharacterStat("brain", -1)
+                                        }
+                                    >
                                         dec
                                     </Button>
                                 </TableCell>
@@ -226,12 +253,20 @@ export default function Trainer() {
                                 <TableCell className="font-bold">
                                     Body
                                 </TableCell>
-                                <TableCell>{bodyStat}</TableCell>
+                                <TableCell>{currentStats.body}</TableCell>
                                 <TableCell className="flex flex-col gap-2">
-                                    <Button onMouseDown={incrementBodyStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyCharacterStat("body", 1)
+                                        }
+                                    >
                                         inc
                                     </Button>
-                                    <Button onMouseDown={decrementBodyStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyCharacterStat("body", -1)
+                                        }
+                                    >
                                         dec
                                     </Button>
                                 </TableCell>
@@ -255,15 +290,19 @@ export default function Trainer() {
                                 <TableCell className="font-bold">
                                     Creativity
                                 </TableCell>
-                                <TableCell>{creativityStat}</TableCell>
+                                <TableCell>{currentStats.creativity}</TableCell>
                                 <TableCell className="flex flex-col gap-2">
                                     <Button
-                                        onMouseDown={incrementCreativityStat}
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("creativity", 1)
+                                        }
                                     >
                                         inc
                                     </Button>
                                     <Button
-                                        onMouseDown={decrementCreativityStat}
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("creativity", -1)
+                                        }
                                     >
                                         dec
                                     </Button>
@@ -273,12 +312,20 @@ export default function Trainer() {
                                 <TableCell className="font-bold">
                                     Support
                                 </TableCell>
-                                <TableCell>{supportStat}</TableCell>
+                                <TableCell>{currentStats.support}</TableCell>
                                 <TableCell className="flex flex-col gap-2">
-                                    <Button onMouseDown={incrementSupportStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("support", 1)
+                                        }
+                                    >
                                         inc
                                     </Button>
-                                    <Button onMouseDown={decrementSupportStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("support", -1)
+                                        }
+                                    >
                                         dec
                                     </Button>
                                 </TableCell>
@@ -287,12 +334,20 @@ export default function Trainer() {
                                 <TableCell className="font-bold">
                                     Healing
                                 </TableCell>
-                                <TableCell>{healingStat}</TableCell>
+                                <TableCell>{currentStats.healing}</TableCell>
                                 <TableCell className="flex flex-col gap-2">
-                                    <Button onMouseDown={incrementHealingStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("healing", 1)
+                                        }
+                                    >
                                         inc
                                     </Button>
-                                    <Button onMouseDown={decrementHealingStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("healing", -1)
+                                        }
+                                    >
                                         dec
                                     </Button>
                                 </TableCell>
@@ -301,12 +356,20 @@ export default function Trainer() {
                                 <TableCell className="font-bold">
                                     Hunting
                                 </TableCell>
-                                <TableCell>{huntingStat}</TableCell>
+                                <TableCell>{currentStats.hunting}</TableCell>
                                 <TableCell className="flex flex-col gap-2">
-                                    <Button onMouseDown={incrementHuntingStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("hunting", 1)
+                                        }
+                                    >
                                         inc
                                     </Button>
-                                    <Button onMouseDown={decrementHuntingStat}>
+                                    <Button
+                                        onMouseDown={() =>
+                                            modifyTrainerStat("hunting", -1)
+                                        }
+                                    >
                                         dec
                                     </Button>
                                 </TableCell>
