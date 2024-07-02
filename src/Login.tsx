@@ -59,7 +59,7 @@ export default function Login() {
                             <FormItem>
                                 <FormLabel>Username</FormLabel>
                                 <FormControl>
-                                    <Input {...field}></Input>
+                                    <Input {...field} />
                                 </FormControl>
                                 <FormDescription>
                                     This is your display name
@@ -75,7 +75,7 @@ export default function Login() {
                             <FormItem>
                                 <FormLabel>Password</FormLabel>
                                 <FormControl>
-                                    <Input {...field}></Input>
+                                    <Input {...field} />
                                 </FormControl>
                                 <FormDescription>
                                     This is your associated password

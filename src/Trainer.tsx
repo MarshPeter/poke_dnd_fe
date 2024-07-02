@@ -1,10 +1,22 @@
 import { useState } from "react";
 import { Button } from "./components/ui/button";
-import { Form, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ItemList from "./components/Trainer/ItemList";
 import { z } from "zod";
 import CharacterStatTable from "./components/Trainer/CharacterStatTable";
 import TrainerStatTable from "./components/Trainer/TrainerStatTable";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "./components/ui/form";
+import { Input } from "./components/ui/input";
 
 const trainerItems = [
     {
@@ -27,7 +39,24 @@ const trainerItems = [
     },
 ];
 
-const itemSchema = z.object({});
+const itemSchema = z.object({
+    name: z
+        .string()
+        .min(4, {
+            message: "Item names must be at least 4 characters long.",
+        })
+        .max(40, {
+            message: "Item names must be at most 40 characters long.",
+        }),
+    description: z
+        .string()
+        .min(10, {
+            message: "Item description must be at least 10 characters long.",
+        })
+        .max(128, {
+            message: "Item description must be at least 128 characters long.",
+        }),
+});
 
 interface TrainerStats {
     heart: number;
@@ -53,9 +82,33 @@ export default function Trainer() {
         healing: 0,
         hunting: 0,
     });
-    const [items, setItems] = useState(trainerItems);
-    const [isNewItem, setIsNewItem] = useState(false);
-    const [newItem, setNewItem] = useState("");
+
+    // Eventually would like items to be searched if they exist in the database, before description is added
+    // const [isNewItem, setIsNewItem] = useState(false);
+
+    const itemForm = useForm<z.infer<typeof itemSchema>>({
+        resolver: zodResolver(itemSchema),
+        defaultValues: {
+            name: "",
+            description: "",
+        },
+    });
+
+    function onItemFormSubmit(values: z.infer<typeof itemSchema>) {
+        let alreadyExists = false;
+
+        for (const item of trainerItems) {
+            if (values.name.toLowerCase() === item.name.toLowerCase()) {
+                itemForm.setError("name", {
+                    type: "custom",
+                    message: `You already have the item:  ${item.name}`,
+                });
+                return;
+            }
+        }
+
+        console.log(values);
+    }
 
     function navigateToPokemonParty() {
         navigate("/trainer/1/pokemon");
@@ -184,7 +237,53 @@ export default function Trainer() {
                     <ItemList trainerItems={trainerItems}></ItemList>
                 </div>
                 <div>
-                    <Form></Form>
+                    <Form {...itemForm}>
+                        <form
+                            onSubmit={itemForm.handleSubmit(onItemFormSubmit)}
+                            className="space-y-8"
+                        >
+                            <FormField
+                                control={itemForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Item name"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            This is your public display name.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={itemForm.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Item Description</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Item description"
+                                                {...field}
+                                            ></Input>
+                                        </FormControl>
+                                        <FormDescription>
+                                            This is the description of your new
+                                            Item.
+                                        </FormDescription>
+                                        <FormMessage></FormMessage>
+                                    </FormItem>
+                                )}
+                            ></FormField>
+                            <Button type="submit">Make Item</Button>
+                        </form>
+                    </Form>
                 </div>
             </div>
         </main>
