@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Button } from "./components/ui/button";
 import ActivePokemon from "./components/PokemonParty/ActivePokemon";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "./components/ui/table";
 
 interface PokemonBrief {
     id: number;
@@ -57,6 +66,17 @@ export default function PokemonParty() {
             inParty: false,
             img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
         },
+        {
+            id: 5,
+            name: "Bulbasaur",
+            maxHealth: 10,
+            currentHealth: 10,
+            rank: 1,
+            typeOne: "Grass",
+            typeTwo: "Grass",
+            inParty: false,
+            img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+        },
     ]);
 
     return (
@@ -80,6 +100,48 @@ export default function PokemonParty() {
                 </section>
                 <section>
                     <h2>PC Pokemon</h2>
+                    <div>
+                        <Table className="border-2 border-gray">
+                            <TableCaption>Pokemon current in PC</TableCaption>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Pokemon Name</TableHead>
+                                    <TableHead>Max Health</TableHead>
+                                    <TableHead>Types</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {pokemon
+                                    .filter((p) => !p.inParty)
+                                    .map((p) => {
+                                        return (
+                                            <TableRow key={p.id}>
+                                                <TableCell className="font-medium">
+                                                    {p.name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {p.maxHealth}
+                                                </TableCell>
+                                                <TableCell className="flex flex-col gap-1">
+                                                    <p
+                                                        className={`bg-green-600 text-white font-bold pb-1 pt-1 pl-3 pr-3 block rounded-lg shadow-xl`}
+                                                    >
+                                                        {p.typeOne}
+                                                    </p>
+                                                    {p.typeTwo ? (
+                                                        <p
+                                                            className={`bg-green-600 text-white font-bold pb-1 pt-1 pl-3 pr-3 block rounded-lg shadow-xl`}
+                                                        >
+                                                            {p.typeTwo}
+                                                        </p>
+                                                    ) : null}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </section>
                 {/* <div className="flex gap-2 border-2 border-gray-300 rounded-lg shadow-lg">
                     <div className="p-1">
