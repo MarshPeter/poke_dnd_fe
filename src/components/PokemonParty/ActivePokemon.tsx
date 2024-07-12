@@ -14,16 +14,17 @@ interface PokemonBrief {
 
 interface Props {
     pokemon: PokemonBrief;
+    onBenchPress: (id: number) => void;
 }
 
-export default function ActivePokemon({ pokemon }: Props) {
+export default function ActivePokemon({ pokemon, onBenchPress }: Props) {
     return (
         <div className="flex gap-2 border-2 border-gray-300 rounded-lg shadow-lg">
             <div className="p-1">
                 <img
                     src={pokemon.img}
                     alt={`Image of ${pokemon.name}`}
-                    className="h-full border-2"
+                    className="h-full border-2 min-w-[110px]"
                 />
             </div>
             <div className="w-full pr-3">
@@ -48,7 +49,12 @@ export default function ActivePokemon({ pokemon }: Props) {
                 </div>
                 <div className="flex justify-between">
                     <Button>View</Button>
-                    <Button className="mb-2">Bench</Button>
+                    <Button
+                        onMouseDown={() => onBenchPress(pokemon.id)}
+                        className="mb-2"
+                    >
+                        Bench
+                    </Button>
                 </div>
             </div>
         </div>

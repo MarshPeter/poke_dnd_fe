@@ -5,6 +5,7 @@ import "./index.css";
 import Login from "./Login.tsx";
 import Trainer from "./Trainer.tsx";
 import PokemonParty from "./PokemonParty.tsx";
+import Pokemon from "./Pokemon.tsx";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
     {
         path: "/trainer/:id/pokemon",
         element: <PokemonParty></PokemonParty>,
+    },
+    {
+        path: "/trainer/:id/:pokemon-id",
+        element: <Pokemon></Pokemon>,
     },
 ]);
 

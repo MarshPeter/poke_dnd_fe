@@ -10,6 +10,11 @@ import {
     TableHeader,
     TableRow,
 } from "./components/ui/table";
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+} from "./components/ui/popover";
 
 interface PokemonBrief {
     id: number;
@@ -77,7 +82,85 @@ export default function PokemonParty() {
             inParty: false,
             img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
         },
+        {
+            id: 6,
+            name: "Bulbasaur",
+            maxHealth: 10,
+            currentHealth: 10,
+            rank: 1,
+            typeOne: "Grass",
+            typeTwo: "Grass",
+            inParty: false,
+            img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+        },
+        {
+            id: 7,
+            name: "Bulbasaur",
+            maxHealth: 10,
+            currentHealth: 10,
+            rank: 1,
+            typeOne: "Grass",
+            typeTwo: "Grass",
+            inParty: false,
+            img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+        },
+        {
+            id: 8,
+            name: "Bulbasaur",
+            maxHealth: 10,
+            currentHealth: 10,
+            rank: 1,
+            typeOne: "Grass",
+            typeTwo: "Grass",
+            inParty: false,
+            img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+        },
     ]);
+
+    function partyHasMaxPokemon() {
+        const maxPokemonPartySize = 6;
+        const pokemonInParty = pokemon.reduce((acc, p) => {
+            if (p.inParty) {
+                console.log("testing");
+                return (acc += 1);
+            }
+
+            return acc;
+        }, 0);
+
+        return maxPokemonPartySize <= pokemonInParty;
+    }
+
+    function changePlaceOfPokemon(id: number) {
+        const newPokemonParty: PokemonBrief[] = [];
+
+        for (const p of pokemon) {
+            // is this the pokemon?
+            if (p.id !== id) {
+                newPokemonParty.push(p);
+                continue;
+            }
+
+            // if in party, remove it
+            if (p.inParty) {
+                p.inParty = false;
+                newPokemonParty.push(p);
+                continue;
+            }
+
+            // if not in party, see if party is max size
+            if (partyHasMaxPokemon()) {
+                newPokemonParty.push(p);
+                continue;
+            }
+
+            // party is not max size, add it
+            p.inParty = true;
+            newPokemonParty.push(p);
+        }
+
+        setPokemon(newPokemonParty);
+    }
 
     return (
         <main className="flex flex-col p-4">
@@ -93,7 +176,10 @@ export default function PokemonParty() {
                             .filter((p) => p.inParty)
                             .map((p) => {
                                 return (
-                                    <ActivePokemon pokemon={p}></ActivePokemon>
+                                    <ActivePokemon
+                                        pokemon={p}
+                                        onBenchPress={changePlaceOfPokemon}
+                                    ></ActivePokemon>
                                 );
                             })}
                     </div>
@@ -117,7 +203,24 @@ export default function PokemonParty() {
                                         return (
                                             <TableRow key={p.id}>
                                                 <TableCell className="font-medium">
-                                                    {p.name}
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button variant="outline">
+                                                                {p.name}
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent>
+                                                            <Button
+                                                                onMouseDown={() =>
+                                                                    changePlaceOfPokemon(
+                                                                        p.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                To Party
+                                                            </Button>
+                                                        </PopoverContent>
+                                                    </Popover>
                                                 </TableCell>
                                                 <TableCell>
                                                     {p.maxHealth}
@@ -143,33 +246,6 @@ export default function PokemonParty() {
                         </Table>
                     </div>
                 </section>
-                {/* <div className="flex gap-2 border-2 border-gray-300 rounded-lg shadow-lg">
-                    <div className="p-1">
-                        <img
-                            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
-                            alt="Bulbasaur"
-                            className="h-full border-2"
-                        />
-                    </div>
-                    <div>
-                        <p>Bulbasaur</p>
-                        <p>Health: 10/10</p>
-                        <p>Rank: 1</p>
-                        <div className="flex gap-2 mb-2 mt-2">
-                            <p
-                                className={`bg-green-600 text-white font-bold pb-1 pt-1 pl-3 pr-3 block rounded-lg shadow-xl`}
-                            >
-                                Grass
-                            </p>
-                            <p
-                                className={`bg-green-600 text-white font-bold pb-1 pt-1 pl-3 pr-3 block rounded-lg shadow-xl`}
-                            >
-                                Grass
-                            </p>
-                        </div>
-                        <Button className="mb-2">Bench</Button>
-                    </div>
-                </div> */}
             </div>
         </main>
     );
