@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { Button } from "./components/ui/button";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "./components/ui/popover";
 
 const MAX_EXPERIENCE = 5;
 
@@ -86,6 +91,12 @@ export default function Pokemon() {
         const newHp = (pokemon.currentHealth += amount);
 
         setPokemon({ ...pokemon, currentHealth: newHp });
+    }
+
+    function invertInspiration() {
+        const newInspiration = !pokemon.inspiration;
+
+        setPokemon({ ...pokemon, inspiration: newInspiration });
     }
 
     return (
@@ -190,6 +201,19 @@ export default function Pokemon() {
                         Dec
                     </Button>
                 </div>
+            </div>
+            <div className="flex items-center gap-2">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="outline">inspiration</Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <Button onMouseDown={() => invertInspiration()}>
+                            {pokemon.inspiration ? "Remove" : "Add"}
+                        </Button>
+                    </PopoverContent>
+                </Popover>
+                <p>{pokemon.inspiration ? "Yes" : "No"}</p>
             </div>
         </main>
     );
