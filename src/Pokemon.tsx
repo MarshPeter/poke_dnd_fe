@@ -5,6 +5,20 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "./components/ui/popover";
+import { PokemonStats } from "./models/PokeBaseStats";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "./components/ui/table";
+import {
+    addStatsTogether,
+    normaliseStatsWithEvolution,
+} from "./lib/statCalculations";
 
 const MAX_EXPERIENCE = 5;
 
@@ -16,20 +30,14 @@ interface PokemonMoves {
     effect: string;
 }
 
-interface PokemonBaseStats {
-    hp: number;
-    attack: number;
-    defense: number;
-    specialAttack: number;
-    specialDefense: number;
-    speed: number;
-}
-
 interface Pokemon {
     id: number;
     name: string;
     speciesName: string;
-    baseStats: PokemonBaseStats;
+    evolution: 1;
+    baseStats: PokemonStats;
+    rankStats: PokemonStats;
+    levelStats: PokemonStats;
     currentHealth: number;
     maxHealth: number;
     level: number;
@@ -46,6 +54,7 @@ export default function Pokemon() {
         id: 1,
         name: "Bulbasaur",
         speciesName: "Bulbasaur",
+        evolution: 1,
         baseStats: {
             hp: 45,
             attack: 49,
@@ -53,6 +62,22 @@ export default function Pokemon() {
             specialAttack: 65,
             specialDefense: 65,
             speed: 45,
+        },
+        rankStats: {
+            hp: 0,
+            attack: 0,
+            defense: 0,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+        },
+        levelStats: {
+            hp: 0,
+            attack: 0,
+            defense: 0,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
         },
         currentHealth: 10,
         maxHealth: 10,
@@ -63,6 +88,11 @@ export default function Pokemon() {
         typeOne: "Grass",
         image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
     });
+
+    const normalisedBaseStats = normaliseStatsWithEvolution(
+        pokemon.baseStats,
+        pokemon.evolution
+    );
 
     function modifyNumericalPokemonStat(statistic: keyof Pokemon, amt: number) {
         if (!(statistic in pokemon)) {
@@ -214,6 +244,93 @@ export default function Pokemon() {
                     </PopoverContent>
                 </Popover>
                 <p>{pokemon.inspiration ? "Yes" : "No"}</p>
+            </div>
+            <div>
+                <h2>Stats</h2>
+                <Table>
+                    <TableCaption>A collection of all your stats</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead></TableHead>
+                            <TableHead>HP</TableHead>
+                            <TableHead>ATK</TableHead>
+                            <TableHead>DEF</TableHead>
+                            <TableHead>SP.ATK</TableHead>
+                            <TableHead>SP.DEF</TableHead>
+                            <TableHead>Speed</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>Base</TableCell>
+                            {Object.keys(normalisedBaseStats).map(
+                                (key: string, idx: number) => {
+                                    return (
+                                        <TableCell key={idx}>
+                                            {
+                                                normalisedBaseStats[
+                                                    key as keyof PokemonStats
+                                                ]
+                                            }
+                                        </TableCell>
+                                    );
+                                }
+                            )}
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Rank</TableCell>
+                            {Object.keys(pokemon.rankStats).map(
+                                (key: string, idx: number) => {
+                                    return (
+                                        <TableCell key={idx}>
+                                            {
+                                                pokemon.rankStats[
+                                                    key as keyof PokemonStats
+                                                ]
+                                            }
+                                        </TableCell>
+                                    );
+                                }
+                            )}
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Level</TableCell>
+                            {Object.keys(pokemon.levelStats).map(
+                                (key: string, idx: number) => {
+                                    return (
+                                        <TableCell key={idx}>
+                                            {
+                                                pokemon.levelStats[
+                                                    key as keyof PokemonStats
+                                                ]
+                                            }
+                                        </TableCell>
+                                    );
+                                }
+                            )}
+                        </TableRow>
+                        <TableRow className="border-t-4">
+                            <TableCell>Total</TableCell>
+                            {Object.keys(
+                                addStatsTogether(
+                                    pokemon.baseStats,
+                                    pokemon.rankStats,
+                                    pokemon.levelStats
+                                )
+                            ).map((key: string, idx: number) => {
+                                return (
+                                    <TableCell key={idx}>
+                                        {
+                                            pokemon.levelStats[
+                                                key as keyof PokemonStats
+                                            ]
+                                        }
+                                    </TableCell>
+                                );
+                            })}
+                        </TableRow>
+                    </TableBody>
+                </Table>
             </div>
         </main>
     );
