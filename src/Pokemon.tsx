@@ -5,7 +5,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "./components/ui/popover";
-import { PokemonStats } from "./models/PokeBaseStats";
+import { PokemonInfo, PokemonStats } from "./models/PokeBaseStats";
 import {
     Table,
     TableBody,
@@ -19,38 +19,12 @@ import {
     addStatsTogether,
     normaliseStatsWithEvolution,
 } from "./lib/statCalculations";
+import PokemonStatTable from "./components/Pokemon/PokemonStatTable";
 
 const MAX_EXPERIENCE = 5;
 
-interface PokemonMoves {
-    name: string;
-    type: string;
-    isPhysicalAttack: boolean;
-    hitModifier: number;
-    effect: string;
-}
-
-interface Pokemon {
-    id: number;
-    name: string;
-    speciesName: string;
-    evolution: 1;
-    baseStats: PokemonStats;
-    rankStats: PokemonStats;
-    levelStats: PokemonStats;
-    currentHealth: number;
-    maxHealth: number;
-    level: number;
-    rank: number;
-    experience: number;
-    inspiration: boolean;
-    typeOne: string;
-    typeTwo?: string;
-    image: string;
-}
-
 export default function Pokemon() {
-    const [pokemon, setPokemon] = useState<Pokemon>({
+    const [pokemon, setPokemon] = useState<PokemonInfo>({
         id: 1,
         name: "Bulbasaur",
         speciesName: "Bulbasaur",
@@ -94,7 +68,10 @@ export default function Pokemon() {
         pokemon.evolution
     );
 
-    function modifyNumericalPokemonStat(statistic: keyof Pokemon, amt: number) {
+    function modifyNumericalPokemonStat(
+        statistic: keyof PokemonInfo,
+        amt: number
+    ) {
         if (!(statistic in pokemon)) {
             console.error(
                 `Pokemon attempted to be accessed with key: ${statistic}. However Key Does not exist`
@@ -247,90 +224,7 @@ export default function Pokemon() {
             </div>
             <div>
                 <h2>Stats</h2>
-                <Table>
-                    <TableCaption>A collection of all your stats</TableCaption>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead></TableHead>
-                            <TableHead>HP</TableHead>
-                            <TableHead>ATK</TableHead>
-                            <TableHead>DEF</TableHead>
-                            <TableHead>SP.ATK</TableHead>
-                            <TableHead>SP.DEF</TableHead>
-                            <TableHead>Speed</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell>Base</TableCell>
-                            {Object.keys(normalisedBaseStats).map(
-                                (key: string, idx: number) => {
-                                    return (
-                                        <TableCell key={idx}>
-                                            {
-                                                normalisedBaseStats[
-                                                    key as keyof PokemonStats
-                                                ]
-                                            }
-                                        </TableCell>
-                                    );
-                                }
-                            )}
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Rank</TableCell>
-                            {Object.keys(pokemon.rankStats).map(
-                                (key: string, idx: number) => {
-                                    return (
-                                        <TableCell key={idx}>
-                                            {
-                                                pokemon.rankStats[
-                                                    key as keyof PokemonStats
-                                                ]
-                                            }
-                                        </TableCell>
-                                    );
-                                }
-                            )}
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Level</TableCell>
-                            {Object.keys(pokemon.levelStats).map(
-                                (key: string, idx: number) => {
-                                    return (
-                                        <TableCell key={idx}>
-                                            {
-                                                pokemon.levelStats[
-                                                    key as keyof PokemonStats
-                                                ]
-                                            }
-                                        </TableCell>
-                                    );
-                                }
-                            )}
-                        </TableRow>
-                        <TableRow className="border-t-4">
-                            <TableCell>Total</TableCell>
-                            {Object.keys(
-                                addStatsTogether(
-                                    pokemon.baseStats,
-                                    pokemon.rankStats,
-                                    pokemon.levelStats
-                                )
-                            ).map((key: string, idx: number) => {
-                                return (
-                                    <TableCell key={idx}>
-                                        {
-                                            pokemon.levelStats[
-                                                key as keyof PokemonStats
-                                            ]
-                                        }
-                                    </TableCell>
-                                );
-                            })}
-                        </TableRow>
-                    </TableBody>
-                </Table>
+                <PokemonStatTable pokemon={pokemon}></PokemonStatTable>
             </div>
         </main>
     );

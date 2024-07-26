@@ -15,11 +15,14 @@ export interface PokemonStats {
     speed: number;
 }
 
-export interface Pokemon {
+export interface PokemonInfo {
     id: number;
     name: string;
     speciesName: string;
+    evolution: 1;
     baseStats: PokemonStats;
+    rankStats: PokemonStats;
+    levelStats: PokemonStats;
     currentHealth: number;
     maxHealth: number;
     level: number;
