@@ -22,6 +22,14 @@ export default function PokemonStatTable({ pokemon }: Props) {
         pokemon.baseStats,
         pokemon.evolution
     );
+    const totalStats = addStatsTogether(
+        normalisedBaseStats,
+        pokemon.rankStats,
+        pokemon.levelStats
+    );
+
+    console.log("total: ", totalStats);
+
     return (
         <Table>
             <TableCaption>A collection of all your stats</TableCaption>
@@ -87,16 +95,10 @@ export default function PokemonStatTable({ pokemon }: Props) {
                 </TableRow>
                 <TableRow className="border-t-4">
                     <TableCell>Total</TableCell>
-                    {Object.keys(
-                        addStatsTogether(
-                            pokemon.baseStats,
-                            pokemon.rankStats,
-                            pokemon.levelStats
-                        )
-                    ).map((key: string, idx: number) => {
+                    {Object.keys(totalStats).map((key: string, idx: number) => {
                         return (
                             <TableCell key={idx}>
-                                {pokemon.levelStats[key as keyof PokemonStats]}
+                                {totalStats[key as keyof PokemonStats]}
                             </TableCell>
                         );
                     })}
